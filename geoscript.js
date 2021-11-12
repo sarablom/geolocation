@@ -1,4 +1,5 @@
 const result = document.querySelector(".result");
+const distance = document.querySelector(".distance");
 const posBtn = document.querySelector(".pos-btn");
 const watchBtn = document.querySelector(".watch-btn");
 const stopBtn = document.querySelector(".stop-btn");
@@ -23,39 +24,44 @@ if ("geolocation" in navigator) {
     });
 
     const loadData = async () => {
+      //Fetching the address via API
       try {
         const res = await fetch(
           `https://geocode.xyz/${latitude},${longitude}?geoit=json&auth=851811454107780777374x81512`
         );
         let data = await res.json();
         if (data.error) {
-          result.innerHTML = "Cannot get location" + data.error.message;
+          result.innerHTML = "Cannot get location " + data.error.message;
         }
         console.log(data);
         const htmlString = `Your coordinates are latitude ${latitude}, longitude ${longitude} and your address is ${data.staddress} in ${data.city}, ${data.country}.
                 `;
         result.innerHTML = htmlString;
       } catch (err) {
-        console.log("Error fetching");
         result.innerHTML = "Cannot get location" + err.message;
       }
     };
 
     function getLocationUpdate() {
-      function success() {
+      function success(pos) {
         let latitude = pos.coords.latitude;
         let longitude = pos.coords.longitude;
-        console.log(latitude, longitude);
+        let timestamp = pos.timestamp;
+        timestamp = new Date(timestamp);
+        distance.innerHTML += `<li>${latitude}, ${longitude} at ${timestamp}</li>`
       }
 
-      function errorHandler() {
-        result.innerHTML = "Couldn´t determine your location";
+      function errorHandler(err) {
+        if(err.code === 1) {
+          result.innerHTML = "Error: Access is denied!";
+       } else if( err.code === 2) {
+          result.innerHTML = "Error: Position is unavailable!";
+       }
       }
 
       const options = {
         enableHighAccuracy: true,
-        maximumAge: 30000,
-        timeout: 10000,
+        timeout: 60000,
       };
 
       watchID = navigator.geolocation.watchPosition(
@@ -63,6 +69,7 @@ if ("geolocation" in navigator) {
         errorHandler,
         options
       );
+      
     }
   });
 } else {
@@ -70,11 +77,3 @@ if ("geolocation" in navigator) {
   result.innerHTML = "Couldn´t determine your location";
 }
 
-// if ("geolocation" in navigator) {
-
-//     const watchID = navigator.geolocation.watchPosition(success, error, options);
-
-//     watchBtn.addEventListener("click", () => {
-//       console.log(watchID);
-//     })
-// }
