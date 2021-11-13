@@ -3,12 +3,14 @@ const distance = document.querySelector(".distance");
 const posBtn = document.querySelector(".pos-btn");
 const watchBtn = document.querySelector(".watch-btn");
 const stopBtn = document.querySelector(".stop-btn");
+const distanceBtn = document.querySelector(".distance-btn");
 
 let watchID;
 let latitude;
 let longitude;
 let pos;
 let timestamp;
+let posArray = [];
 
 posBtn.addEventListener("click", loadData);
 watchBtn.addEventListener("click", getLocationUpdate);
@@ -53,7 +55,21 @@ function getLocationUpdate() {
   function success(pos) {
     latitude = pos.coords.latitude;
     longitude = pos.coords.longitude;
-  }
+    //timestamp = timestamp.getDate() + timestamp.getMonth()
+    timestamp = new Date(timestamp);
+    posArray.push({
+      lat: pos.coords.latitude,
+      lon: pos.coords.longitude,
+      time: new Date(timestamp)
+    });
+    console.log(posArray);
+
+    let htmlString = posArray
+      .map(position => {
+        return `<li className="listItem">Latitude: ${position.lat}<br/>Longitude: ${position.lon}<br/>at ${position.time}</li>`;
+      });
+    distance.innerHTML = htmlString;
+  } 
 
   function errorHandler(err) {
     if (err.code === 1) {
@@ -65,7 +81,8 @@ function getLocationUpdate() {
 
   const options = {
     enableHighAccuracy: true,
-    timeout: 10000,
+    timeout: 5000,
+    maximumAge: 0,
   };
 
   watchID = navigator.geolocation.watchPosition(success, errorHandler, options);
@@ -73,8 +90,30 @@ function getLocationUpdate() {
 
 function stopRecording() {
   navigator.geolocation.clearWatch(watchID);
-  timestamp = new Date(timestamp);
-  distance.innerHTML += `<li>${latitude}, ${longitude} at ${timestamp}</li>`;
+  distance.classList.remove("hide");
+  distanceBtn.classList.remove("hide");
 }
 
+function calculateDistance() {
+  let lat1 = 57.6870068;
+  let lat2 = 57.6963043;
+  let lon1 = 11.9182804;
+  let lon2 = 11.9355128;
+  const R = 6371e3; // metres
+  const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
 
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  const d = R * c; // in metres
+  console.log(Math.round(d));
+
+  //const just = posArray.forEach((pos) => {});
+}
+
+distanceBtn.addEventListener("click", calculateDistance);

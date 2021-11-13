@@ -17,6 +17,7 @@ body {
     color: rgb(19, 17, 17);
     border: none;
     padding: .3rem 1rem;
+    margin: 1rem .5rem;
     border-radius: .3rem;
     font-family: inherit;
     cursor: pointer;
@@ -30,3 +31,6 @@ body {
     display: none;
 }
 
+.distance {
+    list-style-type: none;
+}
