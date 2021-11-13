@@ -10,6 +10,7 @@ let latitude;
 let longitude;
 let pos;
 let timestamp;
+let time;
 let posArray = [];
 
 posBtn.addEventListener("click", loadData);
@@ -57,17 +58,19 @@ function getLocationUpdate() {
     longitude = pos.coords.longitude;
     //timestamp = timestamp.getDate() + timestamp.getMonth()
     timestamp = new Date(timestamp);
+    time = timestamp.toLocaleString();
     posArray.push({
       lat: pos.coords.latitude,
       lon: pos.coords.longitude,
-      time: new Date(timestamp)
+      time: time
     });
     console.log(posArray);
-
+ 
     let htmlString = posArray
       .map(position => {
         return `<li className="listItem">Latitude: ${position.lat}<br/>Longitude: ${position.lon}<br/>at ${position.time}</li>`;
       });
+      
     distance.innerHTML = htmlString;
   } 
 
