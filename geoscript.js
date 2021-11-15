@@ -66,10 +66,13 @@ function getLocationUpdate() {
     });
     console.log(posArray);
  
-    let htmlString = posArray
-      .map(position => {
-        return `<li className="listItem">Latitude: ${position.lat}<br/>Longitude: ${position.lon}<br/>at ${position.time}</li>`;
-      });
+    let htmlString = '';
+    htmlString = posArray
+    .map((position) => {
+      return `<li className="listItem">Latitude: ${position.lat}, Longitude: ${position.lon} at ${position.time}</li>`;
+    }).join();
+    
+    htmlString.replace('"','');
       
     distance.innerHTML = htmlString;
   } 
